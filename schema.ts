@@ -2,6 +2,7 @@ import { pgTable, serial, varchar, integer, timestamp, text, boolean, pgEnum } f
 
 // ========== ENUMS ==========
 export const userRoleEnum = pgEnum("user_role", ["patient", "ambulance_driver", "hospital_admin", "system_admin"]);
+export const userStatusEnum = pgEnum("user_status", ["active", "deactivated", "blacklisted"]);
 export const emergencyLevelEnum = pgEnum("emergency_level", ["critical", "urgent", "non_urgent"]);
 export const ambulanceStatusEnum = pgEnum("ambulance_status", ["available", "on_trip", "unavailable"]);
 export const tripStatusEnum = pgEnum("trip_status", ["pending", "en_route", "picked_up", "arrived", "cancelled"]);
@@ -16,6 +17,7 @@ export const users = pgTable("users", {
   passwordHash: text("password_hash").notNull(),
   role: userRoleEnum("role").notNull().default("patient"),
   nationalId: varchar("national_id", { length: 20 }).unique(),
+  status: userStatusEnum("status").default("active").notNull(),
   createdAt: timestamp("created_at").defaultNow(),
 });
 
@@ -80,7 +82,7 @@ export const penalties = pgTable("penalties", {
   id: serial("id").primaryKey(),
   userId: integer("user_id").references(() => users.id, { onDelete: "cascade" }).notNull(),
   reason: text("reason").notNull(),
-  count: integer("count").default(1),
+  count: integer("count").default(1), // number of offenses
   createdAt: timestamp("created_at").defaultNow(),
 });
 
