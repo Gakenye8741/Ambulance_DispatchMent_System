@@ -5,6 +5,7 @@ export const userRoleEnum = pgEnum("user_role", ["patient", "ambulance_driver", 
 export const emergencyLevelEnum = pgEnum("emergency_level", ["critical", "urgent", "non_urgent"]);
 export const ambulanceStatusEnum = pgEnum("ambulance_status", ["available", "on_trip", "unavailable"]);
 export const tripStatusEnum = pgEnum("trip_status", ["pending", "en_route", "picked_up", "arrived", "cancelled"]);
+export const actionTypeEnum = pgEnum("action_type", ["emergency_request", "login", "logout", "joker_detected", "trip_update", "other"]);
 
 // ========== USERS ==========
 export const users = pgTable("users", {
@@ -80,5 +81,15 @@ export const penalties = pgTable("penalties", {
   userId: integer("user_id").references(() => users.id, { onDelete: "cascade" }).notNull(),
   reason: text("reason").notNull(),
   count: integer("count").default(1),
+  createdAt: timestamp("created_at").defaultNow(),
+});
+
+// ========== ACTIVITY LOGS ==========
+export const activityLogs = pgTable("activity_logs", {
+  id: serial("id").primaryKey(),
+  userId: integer("user_id").references(() => users.id),
+  actionType: actionTypeEnum("action_type").notNull(),
+  description: text("description"),
+  ipAddress: varchar("ip_address", { length: 50 }),
   createdAt: timestamp("created_at").defaultNow(),
 });
