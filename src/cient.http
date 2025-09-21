@@ -1,0 +1,335 @@
+### ============================
+### 🔐 AUTH TESTING
+### ============================
+
+# 1️⃣ Register Admin User
+POST http://localhost:5000/api/auth/register
+Content-Type: application/json
+
+{
+  "fullName": "Gakenye Ndiritu",
+  "email": "admin@example.com",
+  "phone": "01123154",
+  "nationalId": "123456789",
+  "passwordHash": "12345678",
+  "role": "system_admin"
+}
+
+###
+
+# 2️⃣ Login Admin User
+POST http://localhost:5000/api/auth/login
+Content-Type: application/json
+
+{
+  "email": "admin@example.com",
+  "passwordHash": "12345678"
+}
+
+###
+
+# 3️⃣ Register Patient User
+POST http://localhost:5000/api/auth/register
+Content-Type: application/json
+
+{
+  "fullName": "Patient One",
+  "email": "patient1@example.com",
+  "phone": "0711001111",
+  "nationalId": "11223344",
+  "passwordHash": "patientpass",
+  "role": "patient"
+}
+
+###
+
+# 4️⃣ Login Patient User
+POST http://localhost:5000/api/auth/login
+Content-Type: application/json
+
+{
+  "email": "patient1@example.com",
+  "passwordHash": "patientpass"
+}
+
+###
+
+### ============================
+### 👥 USERS ENDPOINTS
+### ============================
+
+# 5️⃣ Get All Users
+GET http://localhost:5000/api/users/allUsers
+
+###
+
+# 6️⃣ Get User by National ID
+GET http://localhost:5000/api/users/11223344
+
+###
+
+# 7️⃣ Update User (Patient updates only phone, fullname, password)
+PUT http://localhost:5000/api/users/updateUser/11223344
+Content-Type: application/json
+
+{
+  "fullName": "Patient One Updated",
+  "phone": "0711223344",
+  "passwordHash": "newpass123"
+}
+
+###
+
+# 8️⃣ Delete User
+DELETE http://localhost:5000/api/users/deleteUser/11223344
+
+###
+
+### ============================
+### 🏥 HOSPITAL ENDPOINTS
+### ============================
+
+# 9️⃣ Register Hospital
+POST http://localhost:5000/api/hospitals/register
+Content-Type: application/json
+
+{
+  "name": "Nairobi West Hospital",
+  "address": "Langata Rd, Nairobi",
+  "latitude": "-1.3091",
+  "longitude": "36.8147",
+  "phone": "+254700112233",
+  "email": "nairobiwest@example.com",
+  "isPublic": true
+}
+
+###
+
+# 10️⃣ Get All Hospitals
+GET http://localhost:5000/api/hospitals/all
+
+###
+
+# 11️⃣ Get Hospital By ID
+GET http://localhost:5000/api/hospitals/1
+
+###
+
+# 12️⃣ Update Hospital
+PUT http://localhost:5000/api/hospitals/update/1
+Content-Type: application/json
+
+{
+  "name": "Nairobi West Hospital Updated",
+  "phone": "+254711223344",
+  "address": "Langata Rd, Nairobi CBD"
+}
+
+###
+
+# 13️⃣ Delete Hospital
+DELETE http://localhost:5000/api/hospitals/delete/1
+
+###
+
+### ============================
+### 🚑 AMBULANCE ENDPOINTS
+### ============================
+
+# 14️⃣ Register Ambulance Driver
+POST http://localhost:5000/api/auth/register
+Content-Type: application/json
+
+{
+  "fullName": "John Doe",
+  "email": "driver@example.com",
+  "phone": "0112000000",
+  "nationalId": "99887766",
+  "passwordHash": "driverpass123",
+  "role": "ambulance_driver"
+}
+
+###
+
+# 15️⃣ Register Ambulance
+POST http://localhost:5000/api/ambulances/register
+Content-Type: application/json
+
+{
+  "hospitalId": 1,
+  "plateNumber": "KDA 123A",
+  "driverId": 2,
+  "status": "available"
+}
+
+###
+
+# 16️⃣ Get All Ambulances
+GET http://localhost:5000/api/ambulances/all
+
+###
+
+# 17️⃣ Get Ambulance by ID
+GET http://localhost:5000/api/ambulances/1
+
+###
+
+# 18️⃣ Update Ambulance
+PUT http://localhost:5000/api/ambulances/update/1
+Content-Type: application/json
+
+{
+  "status": "available",
+  "plateNumber": "KDA 123C"
+}
+
+###
+
+# 19️⃣ Delete Ambulance
+DELETE http://localhost:5000/api/ambulances/delete/1
+
+###
+
+### ============================
+### 🚨 EMERGENCY REQUESTS
+### ============================
+
+# 20️⃣ Register Emergency Request
+POST http://localhost:5000/api/emergency-requests/create
+Content-Type: application/json
+
+{
+  "patientId": 3,
+  "hospitalId": 1,
+  "ambulanceId": 1,
+  "emergencyLevel": "critical",
+  "description": "Patient has severe injury",
+  "latitude": "-1.3000",
+  "longitude": "36.8000"
+}
+
+###
+
+# 21️⃣ Get All Emergency Requests
+GET http://localhost:5000/api/emergency-requests/all
+
+###
+
+# 22️⃣ Get Emergency Request By ID
+GET http://localhost:5000/api/emergency-requests/1
+
+###
+
+# 23️⃣ Update Emergency Request
+PUT http://localhost:5000/api/emergency-requests/update/1
+Content-Type: application/json
+
+{
+  "status": "in_progress"
+}
+
+###
+
+# 24️⃣ Delete Emergency Request
+DELETE http://localhost:5000/api/emergency-requests/delete/1
+
+###
+
+### ============================
+### 🚗 TRIPS ENDPOINTS
+### ============================
+
+# 25️⃣ Register Trip
+POST http://localhost:5000/api/trips/register
+Content-Type: application/json
+
+{
+  "requestId": 1,
+  "ambulanceId": 1,
+  "driverId": 2
+}
+
+###
+
+# 26️⃣ Get All Trips
+GET http://localhost:5000/api/trips/all
+
+###
+
+# 27️⃣ Get Trip by ID
+GET http://localhost:5000/api/trips/1
+
+###
+
+# 28️⃣ Update Trip
+PUT http://localhost:5000/api/trips/update/1
+Content-Type: application/json
+
+{
+  "status": "en_route",
+  "startedAt": "2025-09-21T09:30:00Z"
+}
+
+###
+
+# 29️⃣ Cancel Trip
+PUT http://localhost:5000/api/trips/cancel/1
+
+###
+
+# 30️⃣ Delete Trip
+DELETE http://localhost:5000/api/trips/delete/1
+
+###
+
+### ============================
+### ⚖️ PENALTIES
+### ============================
+
+# 31️⃣ Register Penalty
+POST http://localhost:5000/api/penalties/register
+Content-Type: application/json
+
+{
+  "userId": 3,
+  "reason": "Failure to follow emergency instructions"
+}
+
+###
+
+# 32️⃣ Get All Penalties
+GET http://localhost:5000/api/penalties/all
+
+###
+
+# 33️⃣ Get Penalty By ID
+GET http://localhost:5000/api/penalties/1
+
+###
+
+# 34️⃣ Update Penalty
+PUT http://localhost:5000/api/penalties/update/1
+Content-Type: application/json
+
+{
+  "reason": "Patient did not comply with emergency team instructions"
+}
+
+###
+
+# 35️⃣ Delete Penalty
+DELETE http://localhost:5000/api/penalties/delete/1
+
+###
+
+### ============================
+### 📝 ACTIVITY LOGS
+### ============================
+
+# 36️⃣ Get All Activity Logs
+GET http://localhost:5000/api/activity-logs/all
+
+###
+
+# 37️⃣ Get Activity Log By ID
+GET http://localhost:5000/api/activity-logs/1
