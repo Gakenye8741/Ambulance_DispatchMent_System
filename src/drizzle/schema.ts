@@ -7,7 +7,53 @@ export const userStatusEnum = pgEnum("user_status", ["active", "deactivated", "b
 export const emergencyLevelEnum = pgEnum("emergency_level", ["critical", "urgent", "non_urgent"]);
 export const ambulanceStatusEnum = pgEnum("ambulance_status", ["available", "on_trip", "unavailable"]);
 export const tripStatusEnum = pgEnum("trip_status", ["pending", "en_route", "picked_up", "arrived", "cancelled"]);
-export const actionTypeEnum = pgEnum("action_type", ["emergency_request", "login", "logout", "joker_detected", "trip_update", "other"]);
+export const actionTypeEnum = pgEnum("action_type", [
+  // 🔐 Auth
+  "login",
+  "logout",
+
+  // 👤 Users
+  "user_create",
+  "user_update",
+  "user_delete",
+  "user_read",
+
+  // 🏥 Hospitals
+  "hospital_create",
+  "hospital_update",
+  "hospital_delete",
+
+  // 👨‍⚕️ Hospital Admins
+  "hospital_admin_create",
+  "hospital_admin_update",
+  "hospital_admin_delete",
+
+  // 🚑 Ambulances
+  "ambulance_create",
+  "ambulance_update",
+  "ambulance_delete",
+
+  // 📟 Emergency Requests
+  "emergency_request_create",
+  "emergency_request_update",
+  "emergency_request_delete",
+
+  // 🚨 Trips
+  "trip_create",
+  "trip_update",
+  "trip_delete",
+  "trip_cancel",
+
+  // ⚖️ Penalties
+  "penalty_create",
+  "penalty_update",
+  "penalty_delete",
+
+  // 🕵️ System / Special
+  "joker_detected",
+  "other"
+]);
+
 
 // ==========================
 // TABLES

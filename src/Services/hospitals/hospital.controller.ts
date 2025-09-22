@@ -4,18 +4,19 @@ import {
   getAllHospitalsServices,
   updateHospitalServices,
   getHospitalByIdServices,
-  registerHospitalService
+  registerHospitalService,
 } from "./hospital.service";
+import { registerActivityLogService } from "../ActivityLogs/ActivityLogs.service";
 
 // 🏥 Get All Hospitals
 export const getAllHospitals = async (req: Request, res: Response) => {
   try {
     const allHospitals = await getAllHospitalsServices();
     if (!allHospitals || allHospitals.length === 0) {
-      res.status(400).json({ message: "⚠️ No hospitals found" });
-    } else {
-      res.status(200).json({ allHospitals });
+      return res.status(400).json({ message: "⚠️ No hospitals found" });
     }
+
+    res.status(200).json({ allHospitals });
   } catch (error: any) {
     res.status(500).json({
       error: error.message || "❌ Error Occurred While Fetching Hospitals",
@@ -28,14 +29,12 @@ export const getHospitalById = async (req: Request, res: Response) => {
   try {
     const { id } = req.params;
     if (!id) {
-      res.status(400).json({ error: "⚠️ id is required" });
-      return;
+      return res.status(400).json({ error: "⚠️ id is required" });
     }
 
     const hospital = await getHospitalByIdServices(Number(id));
     if (!hospital) {
-      res.status(404).json({ error: "❌ Hospital not found" });
-      return;
+      return res.status(404).json({ error: "❌ Hospital not found" });
     }
 
     res.status(200).json({ hospital });
@@ -51,6 +50,15 @@ export const registerHospital = async (req: Request, res: Response) => {
   try {
     const hospitalData = req.body;
     const message = await registerHospitalService(hospitalData);
+
+    // 📝 Log activity
+    await registerActivityLogService({
+      userId: (req as any).user?.id || null,
+      actionType: "hospital_create",
+      description: `Registered new hospital: ${hospitalData.name || "Unknown"}`,
+      ipAddress: req.ip,
+    });
+
     res.status(201).json({ message });
   } catch (error: any) {
     res.status(500).json({
@@ -64,11 +72,19 @@ export const deleteHospital = async (req: Request, res: Response) => {
   try {
     const { id } = req.params;
     if (!id) {
-      res.status(400).json({ error: "⚠️ id is required" });
-      return;
+      return res.status(400).json({ error: "⚠️ id is required" });
     }
 
     const deletedHospital = await deleteHospitalServices(Number(id));
+
+    // 📝 Log activity
+    await registerActivityLogService({
+      userId: (req as any).user?.id || null,
+      actionType: "hospital_delete",
+      description: `Deleted hospital with id: ${id}`,
+      ipAddress: req.ip,
+    });
+
     res.status(200).json({ message: deletedHospital });
   } catch (error: any) {
     res.status(500).json({
@@ -84,11 +100,19 @@ export const updateHospital = async (req: Request, res: Response) => {
     const hospitalUpdates = req.body;
 
     if (!id) {
-      res.status(400).json({ error: "⚠️ id is required" });
-      return;
+      return res.status(400).json({ error: "⚠️ id is required" });
     }
 
     const updatedHospital = await updateHospitalServices(Number(id), hospitalUpdates);
+
+    // 📝 Log activity
+    await registerActivityLogService({
+      userId: (req as any).user?.id || null,
+      actionType: "hospital_update",
+      description: `Updated hospital with id: ${id}`,
+      ipAddress: req.ip,
+    });
+
     res.status(200).json({ message: updatedHospital });
   } catch (error: any) {
     res.status(500).json({

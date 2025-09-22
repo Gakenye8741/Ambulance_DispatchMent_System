@@ -10,14 +10,15 @@ GET http://localhost:5000/api/users/AllUsers
 
 
 # 1️⃣ Register Admin User
+###
 POST http://localhost:5000/api/auth/register
 Content-Type: application/json
 
 {
   "fullName": "Gakenye Ndiritu",
-  "email": "admin@example.com",
-  "phone": "01123154",
-  "nationalId": "123456789",
+  "email": "admin1@example.com",
+  "phone": "011231544",
+  "nationalId": "1234567",
   "passwordHash": "12345678",
   "role": "system_admin"
 }
@@ -278,7 +279,7 @@ Content-Type: application/json
 
 {
   "requestId": 1,
-  "ambulanceId": 1,
+  "ambulanceId": 2,
   "driverId": 2
 }
 

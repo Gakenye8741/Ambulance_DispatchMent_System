@@ -6,14 +6,14 @@ import {
   updateHospitalAdminService,
   deleteHospitalAdminService,
 } from "./hospitalAdmin.service";
+import { registerActivityLogService } from "../ActivityLogs/ActivityLogs.service";
 
 // 👥 Get All Hospital Admins
 export const getAllHospitalAdmins = async (req: Request, res: Response) => {
   try {
     const admins = await getAllHospitalAdminsService();
     if (!admins || admins.length === 0) {
-      res.status(404).json({ message: "⚠️ No hospital admins found" });
-      return;
+      return res.status(404).json({ message: "⚠️ No hospital admins found" });
     }
     res.status(200).json({ admins });
   } catch (error: any) {
@@ -28,14 +28,12 @@ export const getHospitalAdminById = async (req: Request, res: Response) => {
   try {
     const { id } = req.params;
     if (!id) {
-      res.status(400).json({ error: "⚠️ id is required" });
-      return;
+      return res.status(400).json({ error: "⚠️ id is required" });
     }
 
     const admin = await getHospitalAdminByIdService(Number(id));
     if (!admin) {
-      res.status(404).json({ error: "❌ Hospital admin not found" });
-      return;
+      return res.status(404).json({ error: "❌ Hospital admin not found" });
     }
 
     res.status(200).json({ admin });
@@ -52,11 +50,19 @@ export const registerHospitalAdmin = async (req: Request, res: Response) => {
     const { userId, hospitalId } = req.body;
 
     if (!userId || !hospitalId) {
-      res.status(400).json({ error: "⚠️ userId and hospitalId are required" });
-      return;
+      return res.status(400).json({ error: "⚠️ userId and hospitalId are required" });
     }
 
     const message = await registerHospitalAdminService({ userId, hospitalId });
+
+    // 📝 Log activity
+    await registerActivityLogService({
+      userId: (req as any).user?.id || null,
+      actionType: "hospital_admin_create",
+      description: `Assigned user ${userId} as admin of hospital ${hospitalId}`,
+      ipAddress: req.ip,
+    });
+
     res.status(201).json({ message });
   } catch (error: any) {
     res.status(500).json({
@@ -72,8 +78,7 @@ export const updateHospitalAdmin = async (req: Request, res: Response) => {
     const { userId, hospitalId } = req.body;
 
     if (!id) {
-      res.status(400).json({ error: "⚠️ id is required" });
-      return;
+      return res.status(400).json({ error: "⚠️ id is required" });
     }
 
     const updates: any = {};
@@ -81,6 +86,15 @@ export const updateHospitalAdmin = async (req: Request, res: Response) => {
     if (hospitalId) updates.hospitalId = hospitalId;
 
     const message = await updateHospitalAdminService(Number(id), updates);
+
+    // 📝 Log activity
+    await registerActivityLogService({
+      userId: (req as any).user?.id || null,
+      actionType: "hospital_admin_update",
+      description: `Updated hospital admin ${id} with data: ${JSON.stringify(updates)}`,
+      ipAddress: req.ip,
+    });
+
     res.status(200).json({ message });
   } catch (error: any) {
     res.status(500).json({
@@ -94,11 +108,19 @@ export const deleteHospitalAdmin = async (req: Request, res: Response) => {
   try {
     const { id } = req.params;
     if (!id) {
-      res.status(400).json({ error: "⚠️ id is required" });
-      return;
+      return res.status(400).json({ error: "⚠️ id is required" });
     }
 
     const message = await deleteHospitalAdminService(Number(id));
+
+    // 📝 Log activity
+    await registerActivityLogService({
+      userId: (req as any).user?.id || null,
+      actionType: "hospital_admin_delete",
+      description: `Deleted hospital admin with id: ${id}`,
+      ipAddress: req.ip,
+    });
+
     res.status(200).json({ message });
   } catch (error: any) {
     res.status(500).json({

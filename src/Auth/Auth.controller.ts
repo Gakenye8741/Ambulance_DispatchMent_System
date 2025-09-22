@@ -2,6 +2,7 @@ import { Request, Response } from "express";
 import bcrypt from "bcrypt";
 import jwt from "jsonwebtoken";
 import { getUserByEmailService, registerUserService } from "./Auth.service";
+import { registerActivityLogService } from "../Services/ActivityLogs/ActivityLogs.service";
 
 const JWT_SECRET = process.env.JWT_SECRET!;
 if (!JWT_SECRET) throw new Error("JWT_SECRET not defined");
@@ -22,6 +23,14 @@ export const RegisterUser = async (req: Request, res: Response) => {
       nationalId,
       phone,
       role: role || "patient",
+    });
+
+    // 📝 Log activity
+    await registerActivityLogService({
+      userId: newUser.id,
+      actionType: "user_create",
+      description: `New user registered: ${fullName} (${email})`,
+      ipAddress: req.ip,
     });
 
     res.status(201).json({ message: "User registered", user: newUser });
@@ -51,6 +60,14 @@ export const loginUser = async (req: Request, res: Response) => {
     };
 
     const token = jwt.sign(payload, JWT_SECRET, { expiresIn: "2h" });
+
+    // 📝 Log activity
+    await registerActivityLogService({
+      userId: user.id,
+      actionType: "login",
+      description: `User logged in: ${user.fullName} (${user.email})`,
+      ipAddress: req.ip,
+    });
 
     res.status(200).json({ message: "Login successful", token, user: payload });
   } catch (error: any) {

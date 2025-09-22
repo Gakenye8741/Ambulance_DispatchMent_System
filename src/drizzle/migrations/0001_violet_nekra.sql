@@ -1,0 +1,4 @@
+ALTER TABLE "activity_logs" ALTER COLUMN "action_type" SET DATA TYPE text;--> statement-breakpoint
+DROP TYPE "public"."action_type";--> statement-breakpoint
+CREATE TYPE "public"."action_type" AS ENUM('login', 'logout', 'user_create', 'user_update', 'user_delete', 'hospital_create', 'hospital_update', 'hospital_delete', 'hospital_admin_create', 'hospital_admin_update', 'hospital_admin_delete', 'ambulance_create', 'ambulance_update', 'ambulance_delete', 'emergency_request_create', 'emergency_request_update', 'emergency_request_delete', 'trip_create', 'trip_update', 'trip_delete', 'trip_cancel', 'penalty_create', 'penalty_update', 'penalty_delete', 'joker_detected', 'other');--> statement-breakpoint
+ALTER TABLE "activity_logs" ALTER COLUMN "action_type" SET DATA TYPE "public"."action_type" USING "action_type"::"public"."action_type";

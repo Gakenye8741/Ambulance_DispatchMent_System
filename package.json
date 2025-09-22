@@ -30,6 +30,7 @@
     "drizzle-kit": "^0.31.1",
     "drizzle-orm": "^0.43.1",
     "file-saver": "^2.0.5",
+    "firebase-admin": "^13.5.0",
     "helmet": "^8.1.0",
     "jsonwebtoken": "^9.0.2",
     "jspdf": "^3.0.1",
