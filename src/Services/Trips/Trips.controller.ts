@@ -6,7 +6,7 @@ import {
   updateTripServices,
   deleteTripServices,
   cancelTripService,
-} from "./Trips.service";
+} from './Trips.service';
 
 // 🚑 Get All Trips
 export const getAllTrips = async (req: Request, res: Response) => {
@@ -44,7 +44,6 @@ export const getTripById = async (req: Request, res: Response) => {
 // ➕ Register Trip
 export const registerTrip = async (req: Request, res: Response) => {
   try {
-    // req.body dates already parsed by middleware ✅
     const message = await registerTripService(req.body);
     res.status(201).json({ message });
   } catch (error: any) {
@@ -58,7 +57,6 @@ export const registerTrip = async (req: Request, res: Response) => {
 export const updateTrip = async (req: Request, res: Response) => {
   try {
     const { id } = req.params;
-    // req.body has Date objects if provided ✅
     const message = await updateTripServices(Number(id), req.body);
     res.status(200).json({ message });
   } catch (error: any) {

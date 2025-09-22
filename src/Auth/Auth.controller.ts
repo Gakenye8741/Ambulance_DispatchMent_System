@@ -1,87 +1,59 @@
 import { Request, Response } from "express";
-import bcrypt, { compareSync } from "bcrypt";
+import bcrypt from "bcrypt";
 import jwt from "jsonwebtoken";
 import { getUserByEmailService, registerUserService } from "./Auth.service";
 
+const JWT_SECRET = process.env.JWT_SECRET!;
+if (!JWT_SECRET) throw new Error("JWT_SECRET not defined");
+
 export const RegisterUser = async (req: Request, res: Response) => {
   try {
-    const user = req.body;
-
-    console.log(`Unhashed password: ${user.passwordHash}`);
-
-    if (!user.fullName || !user.email || !user.passwordHash || !user.nationalId || !user.phone) {
-      return res.status(400).json({ error: "All Fields Are Required!!!" });
+    const { fullName, email, passwordHash, nationalId, phone, role } = req.body;
+    if (!fullName || !email || !passwordHash || !nationalId || !phone) {
+      return res.status(400).json({ error: "All fields are required!" });
     }
 
-    // Hash Password
-    const salt = await bcrypt.genSalt(10);
-    const hashedPassword = await bcrypt.hash(user.passwordHash, salt);
-    user.passwordHash = hashedPassword;
+    const hashedPassword = await bcrypt.hash(passwordHash, 10);
 
-    // Save user to DB
-    const newUser = await registerUserService(user);
+    const newUser = await registerUserService({
+      fullName,
+      email,
+      passwordHash: hashedPassword,
+      nationalId,
+      phone,
+      role: role || "patient",
+    });
 
-    if (!newUser) {
-      return res.status(400).json({ error: "User not registered. Error occurred!" });
-    }
-
-    return res.status(201).json({ message: newUser });
-
+    res.status(201).json({ message: "User registered", user: newUser });
   } catch (error: any) {
-    return res.status(500).json({ error: error.message || "Error occurred. Try again." });
+    res.status(500).json({ error: error.message });
   }
 };
 
-// Logic for Logging In
-
-export const loginUser = async (req:Request ,res:Response)=>{
+export const loginUser = async (req: Request, res: Response) => {
   try {
-    const user = req.body;
-    // Checking if the email used to login exists in the database
-    const existingUser  =  await getUserByEmailService(user.email);
-    if(!existingUser){
-      res.status(404).json({error: "No User Found with that Email!!!"});
-      return;
-    }
+    const { email, passwordHash } = req.body;
+    if (!email || !passwordHash) return res.status(400).json({ error: "Email & password required" });
 
-    // Comparing Passwords
-    const isMatch = bcrypt.compareSync(user.passwordHash, existingUser.passwordHash);
-    if(!isMatch){
-      res.status(404).json({error: "Invalid Password!!"})
-      return;
-    }
+    const user = await getUserByEmailService(email);
+    if (!user) return res.status(404).json({ error: "User not found" });
 
-    //  generating  token
-    //  generating token
-const payload = {
-  fullName: existingUser.fullName,
-  nationalId: existingUser.nationalId,
-  email: existingUser.email,
-  phone: existingUser.phone,
-  status: existingUser.status,
-  role: existingUser.role
-};
+    const isMatch = await bcrypt.compare(passwordHash, user.passwordHash);
+    if (!isMatch) return res.status(401).json({ error: "Invalid password" });
 
-let secret = process.env.JWT_SECRET;
-if (!secret) {
-  throw new Error("JWT_SECRET is not defined in environment variables");
-}
+    const payload = {
+      id: user.id,
+      nationalId: user.nationalId,
+      fullName: user.fullName,
+      email: user.email,
+      phone: user.phone,
+      role: user.role,
+    };
 
-// Token expires in 2 hours
-let token = jwt.sign(payload, secret, { expiresIn: "2h" });
+    const token = jwt.sign(payload, JWT_SECRET, { expiresIn: "2h" });
 
-res.status(200).json({
-  token,
-  fullName: existingUser.fullName,
-  nationalId: existingUser.nationalId,
-  status: existingUser.status,
-  phone: existingUser.phone,
-  email: existingUser.email,
-  role: existingUser.role,
-  createdAt: existingUser.createdAt
-});
-
-  } catch (error:any) {
-    res.status(400).json({error: error.message || "Error Occurred Try Again"});
+    res.status(200).json({ message: "Login successful", token, user: payload });
+  } catch (error: any) {
+    res.status(500).json({ error: error.message });
   }
-}
+};

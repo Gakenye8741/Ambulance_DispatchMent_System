@@ -2,17 +2,17 @@ import db from "../../drizzle/db";
 import { activityLogs, TInsertActivityLog, TSelectActivityLog } from "../../drizzle/schema";
 import { desc, eq } from "drizzle-orm";
 
-// 📜 Get All Activity Logs (most recent first)
+// 📜 Get All Activity Logs (most recent first) with user info
 export const getAllActivityLogsServices = async (): Promise<TSelectActivityLog[]> => {
   return await db.query.activityLogs.findMany({
     orderBy: [desc(activityLogs.createdAt)],
     with: {
-      user: true, // include user info
+      user: true, // include related user info
     },
   });
 };
 
-// 🔍 Get Activity Log by ID
+// 🔍 Get Activity Log by ID with user info
 export const getActivityLogByIdServices = async (
   id: number
 ): Promise<TSelectActivityLog | undefined> => {
@@ -28,8 +28,7 @@ export const getActivityLogByIdServices = async (
 export const registerActivityLogService = async (
   log: TInsertActivityLog
 ): Promise<string> => {
-  // Ensure createdAt is set to now if not provided
-  const logToInsert = {
+  const logToInsert: TInsertActivityLog = {
     ...log,
     createdAt: log.createdAt || new Date(),
   };
@@ -38,17 +37,18 @@ export const registerActivityLogService = async (
   return "📝✅ Activity Log Created Successfully 🎉";
 };
 
-// 🔧 Helper: Quickly log activity
+// 🔧 Helper: Quickly log activity for authenticated users
 export const logActivity = async (
   userId: number | null,
-  actionType: string,
+  actionType: keyof typeof activityLogs.actionType | string,
   description: string,
   ipAddress?: string
 ) => {
   await registerActivityLogService({
-    userId,
+    userId: userId || null, // attach authenticated user if available
     actionType: actionType as any, // cast if using enum
     description,
     ipAddress: ipAddress || null,
+    createdAt: new Date(),
   });
 };

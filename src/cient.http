@@ -2,6 +2,13 @@
 ### 🔐 AUTH TESTING
 ### ============================
 
+
+# ============
+####user Testing
+#===============
+GET http://localhost:5000/api/users/AllUsers
+
+
 # 1️⃣ Register Admin User
 POST http://localhost:5000/api/auth/register
 Content-Type: application/json
@@ -27,8 +34,32 @@ Content-Type: application/json
 }
 
 ###
+# Register Hospital Admin
+# 1️⃣ Register Admin User
+POST http://localhost:5000/api/auth/register
+Content-Type: application/json
+
+{
+  "fullName": "Hosptal ADMIN",
+  "email": "hospital_admin@example.com",
+  "phone": "0112315411",
+  "nationalId": "1234567890",
+  "passwordHash": "12345678",
+  "role": "hospital_admin"
+}
+###
+
+#lOGIN hOSPITAL aDMIN
+POST http://localhost:5000/api/auth/login
+Content-Type: application/json
+
+{
+  "email": "hospital_admin@example.com",
+  "passwordHash": "12345678"
+}
 
 # 3️⃣ Register Patient User
+###
 POST http://localhost:5000/api/auth/register
 Content-Type: application/json
 
@@ -153,20 +184,21 @@ Content-Type: application/json
 
 # 15️⃣ Register Ambulance
 POST http://localhost:5000/api/ambulances/register
+Authorization: eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6NCwibmF0aW9uYWxJZCI6IjEyMzQ1Njc4OTAiLCJmdWxsTmFtZSI6Ikhvc3B0YWwgQURNSU4iLCJlbWFpbCI6Imhvc3BpdGFsX2FkbWluQGV4YW1wbGUuY29tIiwicGhvbmUiOiIwMTEyMzE1NDExIiwicm9sZSI6Imhvc3BpdGFsX2FkbWluIiwiaWF0IjoxNzU4NTQxODExLCJleHAiOjE3NTg1NDkwMTF9.FHavNB2E6rQd62h92gTtFOn3QJ8ZUtjeHZ60BJvQrI0
 Content-Type: application/json
 
 {
   "hospitalId": 1,
-  "plateNumber": "KDA 123A",
+  "plateNumber": "KDB 123A",
   "driverId": 2,
-  "status": "available"
+  "status": "unavailable"
 }
 
 ###
 
 # 16️⃣ Get All Ambulances
 GET http://localhost:5000/api/ambulances/all
-
+Authorization: eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6NCwibmF0aW9uYWxJZCI6IjEyMzQ1Njc4OTAiLCJmdWxsTmFtZSI6Ikhvc3B0YWwgQURNSU4iLCJlbWFpbCI6Imhvc3BpdGFsX2FkbWluQGV4YW1wbGUuY29tIiwicGhvbmUiOiIwMTEyMzE1NDExIiwicm9sZSI6Imhvc3BpdGFsX2FkbWluIiwiaWF0IjoxNzU4NTQxODExLCJleHAiOjE3NTg1NDkwMTF9.FHavNB2E6rQd62h92gTtFOn3QJ8ZUtjeHZ60BJvQrI0
 ###
 
 # 17️⃣ Get Ambulance by ID
@@ -176,11 +208,12 @@ GET http://localhost:5000/api/ambulances/1
 
 # 18️⃣ Update Ambulance
 PUT http://localhost:5000/api/ambulances/update/1
+Authorization: eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6MSwibmF0aW9uYWxJZCI6IjEyMzQ1Njc4OSIsImZ1bGxOYW1lIjoiR2FrZW55ZSBOZGlyaXR1IiwiZW1haWwiOiJhZG1pbkBleGFtcGxlLmNvbSIsInBob25lIjoiMDExMjMxNTQiLCJyb2xlIjoic3lzdGVtX2FkbWluIiwiaWF0IjoxNzU4NDY3Mzk1LCJleHAiOjE3NTg0NzQ1OTV9.2KqjrLIlczsYdCD-DWQWLrhuBBCeL2b8fAV0scKkj3A
 Content-Type: application/json
 
 {
   "status": "available",
-  "plateNumber": "KDA 123C"
+  "plateNumber": "KDd 223C"
 }
 
 ###

@@ -10,8 +10,7 @@ export const getAllActivityLogs = async (req: Request, res: Response) => {
   try {
     const logs = await getAllActivityLogsServices();
     if (!logs || logs.length === 0) {
-      res.status(404).json({ message: "⚠️ No activity logs found" });
-      return;
+      return res.status(404).json({ message: "⚠️ No activity logs found" });
     }
     res.status(200).json(logs);
   } catch (error: any) {
@@ -25,8 +24,7 @@ export const getActivityLogById = async (req: Request, res: Response) => {
     const { id } = req.params;
     const log = await getActivityLogByIdServices(Number(id));
     if (!log) {
-      res.status(404).json({ message: "⚠️ Activity log not found" });
-      return;
+      return res.status(404).json({ message: "⚠️ Activity log not found" });
     }
     res.status(200).json(log);
   } catch (error: any) {
@@ -34,35 +32,39 @@ export const getActivityLogById = async (req: Request, res: Response) => {
   }
 };
 
-// Define allowed action types
-type ActionType = "emergency_request" | "login" | "logout" | "joker_detected" | "trip_update" | "other";
+// Allowed action types
+export type ActionType =
+  | "emergency_request"
+  | "login"
+  | "logout"
+  | "joker_detected"
+  | "trip_update"
+  | "other";
 
-// ➕ Log Activity (automated)
+// ➕ Log Activity (helper for routes)
 export const logActivity = async (
   req: Request,
-  res: Response,
   actionType: ActionType,
   description: string
-) => {
+): Promise<void> => {
   try {
-    const userId = (req.user as any)?.id;
+    const userId = req.user?.id || null;  // ✅ use primary key
+
     const ipAddress =
-      req.ip || (req.headers["x-forwarded-for"] as string) || req.connection.remoteAddress;
+      (req.headers["x-forwarded-for"] as string) ||
+      req.ip ||
+      req.connection.remoteAddress ||
+      null;
 
-    if (!userId) {
-      res.status(400).json({ error: "⚠️ User ID not found in request" });
-      return;
-    }
-
-    const message = await registerActivityLogService({
+    await registerActivityLogService({
       userId,
       actionType,
       description,
       ipAddress,
+      createdAt: new Date(),
     });
-
-    res.status(201).json({ message });
   } catch (error: any) {
-    res.status(500).json({ error: error.message || "❌ Error logging activity" });
+    console.error("❌ Error logging activity:", error.message || error);
   }
 };
+

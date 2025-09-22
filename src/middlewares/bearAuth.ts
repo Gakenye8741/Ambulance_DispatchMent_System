@@ -8,12 +8,12 @@ dotenv.config();
 
 // JWT payload type
 type DecodedToken = {
-  username: string;
-  nationalId: number;
+  id: number;
+  nationalId: string;
   email: string;
-  role: typeof userRoleEnum.enumValues[number]; // 'patient' | 'ambulance_driver' | 'hospital_admin' | 'system_admin'
-  firstName: string;
-  lastName: string;
+  role: typeof userRoleEnum.enumValues[number];
+  fullName: string;
+  phone: string;
   exp: number;
 };
 
